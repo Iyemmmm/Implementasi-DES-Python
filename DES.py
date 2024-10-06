@@ -44,14 +44,14 @@ computer_binary = [
 
 # ASCII plain text=COMPUTER
 key = [
-    0, 1, 1, 0, 1, 0, 1, 1,  # 'k'
-    0, 1, 1, 0, 1, 1, 1, 1,  # 'o'
-    0, 1, 1, 0, 1, 1, 0, 0,  # 'l'
-    0, 1, 1, 0, 1, 0, 0, 1,  # 'i'
-    0, 1, 1, 1, 0, 0, 1, 1,  # 's'
-    0, 1, 1, 0, 0, 0, 0, 1,  # 'a'
-    0, 1, 1, 0, 1, 1, 1, 0,  # 'n'
-    0, 1, 1, 0, 0, 1, 0, 1   # 'e'
+    0, 1, 1, 0, 1, 0, 1, 1,  
+    0, 1, 1, 0, 1, 1, 1, 1, 
+    0, 1, 1, 0, 1, 1, 0, 0,  
+    0, 1, 1, 0, 1, 0, 0, 1,  
+    0, 1, 1, 1, 0, 0, 1, 1,
+    0, 1, 1, 0, 0, 0, 0, 1, 
+    0, 1, 1, 0, 1, 1, 1, 0,  
+    0, 1, 1, 0, 0, 1, 0, 1 
 ]
 
 matrix_ekspansi = [
@@ -67,7 +67,7 @@ matrix_ekspansi = [
     # P-Box permutation order
 p_order = [
     16, 7, 20, 21, 29, 12, 28, 17,
-    1, 15, 23, 26,5, 8, 31, 10,
+    1, 15, 23, 26,5, 18, 31, 10,
     2, 8, 24, 14,32, 27, 3, 9,
     19, 13, 30, 6,22, 11, 4, 25
 ]
@@ -94,6 +94,12 @@ def string_to_binary_array(input_string):
         # Memasukkan setiap bit ke dalam array
         binary_array.extend(int(bit) for bit in binary_value)
     return binary_array
+
+def IP(block):
+    hasil = [0] * 64    
+    for i in range(64):
+        hasil[i] = block[initial_permutation[i]-1]
+    return hasil
 
 def PC_1_permutation(key_block):
     hasil = [0] * 56    
@@ -131,6 +137,12 @@ def xor(array1, array2):
 def split_6bit(array):
     return [array[i:i + 6] for i in range(0, len(array), 6)]
 
+def binary_to_hex(binary_str):
+    decimal_value = int(binary_str, 2)
+    hex_value = hex(decimal_value)[2:].upper()
+    return hex_value
+
+
 def sbox(input_bits, sbox_number):
     row = (input_bits[0] << 1) | input_bits[5]
     col = (input_bits[1] << 3) | (input_bits[2] << 2) | (input_bits[3] << 1) | input_bits[4]
@@ -142,6 +154,7 @@ def sbox(input_bits, sbox_number):
             [0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8],
             [4, 1, 14, 8, 13, 6, 2, 11, 15, 12, 9, 7, 3, 10, 5, 0],
             [15, 12, 8, 2, 4, 9, 1, 7, 5, 11, 3, 14, 10, 0, 6, 13]
+
         ],
         2: [
             [15, 1, 8, 14, 6, 11, 3, 4, 9, 7, 2, 13, 12, 0, 5, 10],
@@ -213,397 +226,695 @@ def final(block):
         hasil[i] = block[invers_permutasi[i]-1]
     return hasil
 
+def hex_to_binary(hex_str):
+    decimal_value = int(hex_str, 16)  # Konversi dari hex ke decimal
+    binary_str = bin(decimal_value)[2:]  # Konversi dari decimal ke binary (hilangkan prefix '0b')
+    padded_binary_str = binary_str.zfill(64)  # Pad binary string menjadi 64 bit
+    return [int(bit) for bit in padded_binary_str]
 
 
-input_key=input("Masukkan nilai key: ")
-binary_key=string_to_binary_array(input_key)
-print(binary_key)
-
-# Generasi K1
-binary_key_final = PC_1_permutation(binary_key)
-C0, D0 = split_block(binary_key_final)
-C1 = left_shift(C0)
-D1 = left_shift(D0)
-cr_combine1 = combine(C1, D1)
-K1 = PC_2_permutation(cr_combine1)
-
-# Generasi K2
-C2 = left_shift(C1)
-D2 = left_shift(D1)
-cr_combine2 = combine(C2, D2)
-K2 = PC_2_permutation(cr_combine2)
-
-# Generasi K3
-C3 = left_shift(left_shift(C2))
-D3 = left_shift(left_shift(D2))
-cr_combine3 = combine(C3, D3)
-K3 = PC_2_permutation(cr_combine3)
-
-# Generasi K4
-C4 = left_shift(left_shift(C3))
-D4 = left_shift(left_shift(D3))
-cr_combine4 = combine(C4, D4)
-K4 = PC_2_permutation(cr_combine4)
-
-# Generasi K5
-C5 = left_shift(left_shift(C4))
-D5 = left_shift(left_shift(D4))
-cr_combine5 = combine(C5, D5)
-K5 = PC_2_permutation(cr_combine5)
-
-# Generasi K6
-C6 = left_shift(left_shift(C5))
-D6 = left_shift(left_shift(D5))
-cr_combine6 = combine(C6, D6)
-K6 = PC_2_permutation(cr_combine6)
-
-# Generasi K7
-C7 = left_shift(left_shift(C6))
-D7 = left_shift(left_shift(D6))
-cr_combine7 = combine(C7, D7)
-K7 = PC_2_permutation(cr_combine7)
-
-# Generasi K8
-C8 = left_shift(left_shift(C7))
-D8 = left_shift(left_shift(D7))
-cr_combine8 = combine(C8, D8)
-K8 = PC_2_permutation(cr_combine8)
-
-# Generasi K9
-C9 = left_shift(C8)
-D9 = left_shift(D8)
-cr_combine9 = combine(C9, D9)
-K9 = PC_2_permutation(cr_combine9)
-
-# Generasi K10
-C10 = left_shift(left_shift(C9))
-D10 = left_shift(left_shift(D9))
-cr_combine10 = combine(C10, D10)
-K10 = PC_2_permutation(cr_combine10)
-
-# Generasi K11
-C11 = left_shift(left_shift(C10))
-D11 = left_shift(left_shift(D10))
-cr_combine11 = combine(C11, D11)
-K11 = PC_2_permutation(cr_combine11)
-
-# Generasi K12
-C12 = left_shift(left_shift(C11))
-D12 = left_shift(left_shift(D11))
-cr_combine12 = combine(C12, D12)
-K12 = PC_2_permutation(cr_combine12)
-
-# Generasi K13
-C13 = left_shift(left_shift(C12))
-D13 = left_shift(left_shift(D12))
-cr_combine13 = combine(C13, D13)
-K13 = PC_2_permutation(cr_combine13)
-
-# Generasi K14
-C14 = left_shift(left_shift(C13))
-D14 = left_shift(left_shift(D13))
-cr_combine14 = combine(C14, D14)
-K14 = PC_2_permutation(cr_combine14)
-
-# Generasi K15
-C15 = left_shift(left_shift(C14))
-D15 = left_shift(left_shift(D14))
-cr_combine15 = combine(C15, D15)
-K15 = PC_2_permutation(cr_combine15)
-
-# Generasi K16
-C16 = left_shift(C15)
-D16 = left_shift(D15)
-cr_combine16 = combine(C16, D16)
-K16 = PC_2_permutation(cr_combine16)
-
-# Cetak Hasil
-print("K1:", K1)
-print("K2:", K2)
-print("K3:", K3)
-print("K4:", K4)
-print("K5:", K5)
-print("K6:", K6)
-print("K7:", K7)
-print("K8:", K8)    
-print("K9:", K9)
-print("K10:", K10)
-print("K11:", K11)
-print("K12:", K12)
-print("K13:", K13)
-print("K14:", K14)
-print("K15:", K15)
-print("K16:", K16)
 
 
-# Iterasi 1
-L0, R0 = split_block(computer_binary)
-print("L0 R0: ",L0,R0)
-E_R0 = ekspansi(R0)
-A1 = xor(E_R0, K1)
-result = split_6bit(A1)
-B1 = []
-for i in range(8):
-    output = sbox(result[i], i + 1)
-    B1.extend(output)
-B1_pbox=pbox(B1)
-L1 = R0
-R1 = xor(L0, B1_pbox)
-print("L1 R1: ",L1,R1)
+def enkripsi():
+    input_key=input("Masukkan nilai key: ")
+    input_key_binary=string_to_binary_array(input_key)
+    plain_text=input("Masukkan plain text: ")
+    plain_text_binary=string_to_binary_array(plain_text)
 
-# Iterasi 2
-E_R1 = ekspansi(R1)
-A2 = xor(E_R1, K2)
-result = split_6bit(A2)
-B2 = []
-for i in range(8):
-    output = sbox(result[i], i + 1)
-    B2.extend(output)
-B2_pbox=pbox(B2)
-L2 = R1
-R2 = xor(L1, B2_pbox)
+    # Generasi K1
+    binary_key_final = PC_1_permutation(input_key_binary)
+    C0, D0 = split_block(binary_key_final)
+    C1 = left_shift(C0)
+    D1 = left_shift(D0)
+    cr_combine1 = combine(C1, D1)
+    K1 = PC_2_permutation(cr_combine1)
 
-# Iterasi 3
-E_R2 = ekspansi(R2)
-A3 = xor(E_R2, K3)
-result = split_6bit(A3)
-B3 = []
-for i in range(8):
-    output = sbox(result[i], i + 1)
-    B3.extend(output)
-B3_pbox=pbox(B3)
-L3 = R2
-R3 = xor(L2, B3_pbox)
+    # Generasi K2
+    C2 = left_shift(C1)
+    D2 = left_shift(D1)
+    cr_combine2 = combine(C2, D2)
+    K2 = PC_2_permutation(cr_combine2)
 
-# Iterasi 4
-E_R3 = ekspansi(R3)
-A4 = xor(E_R3, K4)
-result = split_6bit(A4)
-B4 = []
-for i in range(8):
-    output = sbox(result[i], i + 1)
-    B4.extend(output)
-B4_pbox=pbox(B4)
-L4 = R3
-R4 = xor(L3, B4_pbox)
+    # Generasi K3
+    C3 = left_shift(left_shift(C2))
+    D3 = left_shift(left_shift(D2))
+    cr_combine3 = combine(C3, D3)
+    K3 = PC_2_permutation(cr_combine3)
 
-# Iterasi 5
-E_R4 = ekspansi(R4)
-A5 = xor(E_R4, K5)
-result = split_6bit(A5)
-B5 = []
-for i in range(8):
-    output = sbox(result[i], i + 1)
-    B5.extend(output)
-B5_pbox=pbox(B5)
-L5 = R4
-R5 = xor(L4, B5_pbox)
+    # Generasi K4
+    C4 = left_shift(left_shift(C3))
+    D4 = left_shift(left_shift(D3))
+    cr_combine4 = combine(C4, D4)
+    K4 = PC_2_permutation(cr_combine4)
 
-# Iterasi 6
-E_R5 = ekspansi(R5)
-A6 = xor(E_R5, K6)
-result = split_6bit(A6)
-B6 = []
-for i in range(8):
-    output = sbox(result[i], i + 1)
-    B6.extend(output)
-B6_pbox=pbox(B6)
-L6 = R5
-R6 = xor(L5, B6_pbox)
+    # Generasi K5
+    C5 = left_shift(left_shift(C4))
+    D5 = left_shift(left_shift(D4))
+    cr_combine5 = combine(C5, D5)
+    K5 = PC_2_permutation(cr_combine5)
 
-# Iterasi 7
-E_R6 = ekspansi(R6)
-A7 = xor(E_R6, K7)
-result = split_6bit(A7)
-B7 = []
-for i in range(8):
-    output = sbox(result[i], i + 1)
-    B7.extend(output)
-B7_pbox=pbox(B7)
-L7 = R6
-R7 = xor(L6, B7_pbox)
+    # Generasi K6
+    C6 = left_shift(left_shift(C5))
+    D6 = left_shift(left_shift(D5))
+    cr_combine6 = combine(C6, D6)
+    K6 = PC_2_permutation(cr_combine6)
 
-# Iterasi 8
-E_R7 = ekspansi(R7)
-A8 = xor(E_R7, K8)
-result = split_6bit(A8)
-B8 = []
-for i in range(8):
-    output = sbox(result[i], i + 1)
-    B8.extend(output)
-B8_pbox=pbox(B8)
-L8 = R7
-R8 = xor(L7, B8_pbox)
+    # Generasi K7
+    C7 = left_shift(left_shift(C6))
+    D7 = left_shift(left_shift(D6))
+    cr_combine7 = combine(C7, D7)
+    K7 = PC_2_permutation(cr_combine7)
 
-# Iterasi 9
-E_R8 = ekspansi(R8)
-A9 = xor(E_R8, K9)
-result = split_6bit(A9)
-B9 = []
-for i in range(8):
-    output = sbox(result[i], i + 1)
-    B9.extend(output)
-B9_pbox=pbox(B9)
-L9 = R8
-R9 = xor(L8, B9_pbox)
+    # Generasi K8
+    C8 = left_shift(left_shift(C7))
+    D8 = left_shift(left_shift(D7))
+    cr_combine8 = combine(C8, D8)
+    K8 = PC_2_permutation(cr_combine8)
 
-# Iterasi 10
-E_R9 = ekspansi(R9)
-A10 = xor(E_R9, K10)
-result = split_6bit(A10)
-B10 = []
-for i in range(8):
-    output = sbox(result[i], i + 1)
-    B10.extend(output)
-B10_pbox=pbox(B10)
-L10 = R9
-R10 = xor(L9, B10_pbox)
+    # Generasi K9
+    C9 = left_shift(C8)
+    D9 = left_shift(D8)
+    cr_combine9 = combine(C9, D9)
+    K9 = PC_2_permutation(cr_combine9)
 
-# Iterasi 11
-E_R10 = ekspansi(R10)
-A11 = xor(E_R10, K11)
-result = split_6bit(A11)
-B11 = []
-for i in range(8):
-    output = sbox(result[i], i + 1)
-    B11.extend(output)
-B11_pbox=pbox(B11)
-L11 = R10
-R11 = xor(L10, B11_pbox)
+    # Generasi K10
+    C10 = left_shift(left_shift(C9))
+    D10 = left_shift(left_shift(D9))
+    cr_combine10 = combine(C10, D10)
+    K10 = PC_2_permutation(cr_combine10)
 
-# Iterasi 12
-E_R11 = ekspansi(R11)
-A12 = xor(E_R11, K12)
-result = split_6bit(A12)
-B12 = []
-for i in range(8):
-    output = sbox(result[i], i + 1)
-    B12.extend(output)
-B12_pbox=pbox(B12)
-L12 = R11
-R12 = xor(L11, B12_pbox)
+    # Generasi K11
+    C11 = left_shift(left_shift(C10))
+    D11 = left_shift(left_shift(D10))
+    cr_combine11 = combine(C11, D11)
+    K11 = PC_2_permutation(cr_combine11)
 
-# Iterasi 13
-E_R12 = ekspansi(R12)
-A13 = xor(E_R12, K13)
-result = split_6bit(A13)
-B13 = []
-for i in range(8):
-    output = sbox(result[i], i + 1)
-    B13.extend(output)
-B13_pbox=pbox(B13)
-L13 = R12
-R13 = xor(L12, B13_pbox)
+    # Generasi K12
+    C12 = left_shift(left_shift(C11))
+    D12 = left_shift(left_shift(D11))
+    cr_combine12 = combine(C12, D12)
+    K12 = PC_2_permutation(cr_combine12)
 
-# Iterasi 14
-E_R13 = ekspansi(R13)
-A14 = xor(E_R13, K14)
-result = split_6bit(A14)
-B14 = []
-for i in range(8):
-    output = sbox(result[i], i + 1)
-    B14.extend(output)
-B14_pbox=pbox(B14)
-L14 = R13
-R14 = xor(L13, B14_pbox)
+    # Generasi K13
+    C13 = left_shift(left_shift(C12))
+    D13 = left_shift(left_shift(D12))
+    cr_combine13 = combine(C13, D13)
+    K13 = PC_2_permutation(cr_combine13)
 
-# Iterasi 15
-E_R14 = ekspansi(R14)
-A15 = xor(E_R14, K15)
-result = split_6bit(A15)
-B15 = []
-for i in range(8):
-    output = sbox(result[i], i + 1)
-    B15.extend(output)
-B15_pbox=pbox(B15)
-L15 = R14
-R15 = xor(L14, B15_pbox)
+    # Generasi K14
+    C14 = left_shift(left_shift(C13))
+    D14 = left_shift(left_shift(D13))
+    cr_combine14 = combine(C14, D14)
+    K14 = PC_2_permutation(cr_combine14)
 
-# Iterasi 16
-E_R15 = ekspansi(R15)
-A16 = xor(E_R15, K16)
-result = split_6bit(A16)
-B16 = []
-for i in range(8):
-    output = sbox(result[i], i + 1)
-    B16.extend(output)
-B16_pbox=pbox(B16)
-L16 = R15
-R16 = xor(L15, B16_pbox)
+    # Generasi K15
+    C15 = left_shift(left_shift(C14))
+    D15 = left_shift(left_shift(D14))
+    cr_combine15 = combine(C15, D15)
+    K15 = PC_2_permutation(cr_combine15)
 
-print("L1:", L1)
-print("L2:", L2)
-print("L3:", L3)
-print("L4:", L4)
-print("L5:", L5)
-print("L6:", L6)
-print("L7:", L7)
-print("L8:", L8)    
-print("L9:", L9)
-print("L10:", L10)
-print("L11:", L11)
-print("L12:", L12)
-print("L13:", L13)
-print("L14:", L14)
-print("L15:", L15)
-print("L16:", L16)
+    # Generasi K16
+    C16 = left_shift(C15)
+    D16 = left_shift(D15)
+    cr_combine16 = combine(C16, D16)
+    K16 = PC_2_permutation(cr_combine16)
 
-print("R1:", R1)
-print("R2:", R2)
-print("R3:", R3)
-print("R4:", R4)
-print("R5:", R5)
-print("R6:", R6)
-print("R7:", R7)
-print("R8:", R8)    
-print("R9:", R9)
-print("R10:", R10)
-print("R11:", R11)
-print("R12:", R12)
-print("R13:", R13)
-print("R14:", R14)
-print("R15:", R15)
-print("R16:", R16)
+    # Cetak Hasil
+    # print("K1:", K1)
+    # print("K2:", K2)
+    # print("K3:", K3)
+    # print("K4:", K4)
+    # print("K5:", K5)
+    # print("K6:", K6)
+    # print("K7:", K7)
+    # print("K8:", K8)    
+    # print("K9:", K9)
+    # print("K10:", K10)
+    # print("K11:", K11)
+    # print("K12:", K12)
+    # print("K13:", K13)
+    # print("K14:", K14)
+    # print("K15:", K15)
+    # print("K16:", K16)
 
-final_block = combine(L16, R16)
-ciphertext = final(final_block)
-print("final_block",final_block)
-print("FINAL: ", ciphertext)
 
-# E_R0=[
-#     1,0,0,0,0,0,
-#     0,0,0,0,0,0,
-#     0,0,0,0,0,0,
-#     0,0,0,0,0,0,
-#     0,0,0,0,0,0,
-#     0,0,1,1,0,1,
-#     0,1,0,0,0,0,
-#     0,0,0,1,1,0
-# ]
-# K1=[
-#     0,0,0,1,1,0,
-#     1,1,0,0,0,0,
-#     0,0,1,0,1,1,
-#     1,0,1,1,1,1,
-#     1,1,1,1,1,1,
-#     0,0,0,1,1,1,
-#     0,0,0,0,0,1,
-#     1,1,0,0,1,0
-# ]
-# L0=[
-#     1,1,1,1,1,1,1,1,
-#     1,0,1,1,1,0,0,0,
-#     0,1,1,1,0,1,1,0,
-#     0,1,0,1,0,1,1,1
-# ]
-# hasil_xor=xor(E_R0,K1)
-# print("Hasil XOR: ",hasil_xor)
-# result=split_6bit(hasil_xor)
-# B1=[]
-# for i in range(8):
-#     output = sbox(result[i], i + 1)
-#     B1.extend(output)
-# print("B1",B1)
-# pbox_res=pbox(B1)
-# print("PBOX:",pbox_res)
-# new_R1=xor(pbox_res,L0)
+    # Iterasi 1
+    IP_res=IP(plain_text_binary)
+    L0, R0 = split_block(IP_res)
+    # print("L0 R0: ",L0,R0)
+    E_R0 = ekspansi(R0)
+    A1 = xor(E_R0, K1)
+    result = split_6bit(A1)
+    B1 = []
+    for i in range(8):
+        output = sbox(result[i], i + 1)
+        B1.extend(output)
+    B1_pbox=pbox(B1)
+    L1 = R0
+    R1 = xor(L0, B1_pbox)
+    # print("L1 R1: ",L1,R1)
+
+    # Iterasi 2
+    E_R1 = ekspansi(R1)
+    A2 = xor(E_R1, K2)
+    result = split_6bit(A2)
+    B2 = []
+    for i in range(8):
+        output = sbox(result[i], i + 1)
+        # print("SBOX",output)
+        B2.extend(output)
+    B2_pbox=pbox(B2)
+    # print("B2_pbox:",B2_pbox)
+    L2 = R1
+    R2 = xor(L1, B2_pbox)
+
+    # Iterasi 3
+    E_R2 = ekspansi(R2)
+    A3 = xor(E_R2, K3)
+    result = split_6bit(A3)
+    B3 = []
+    for i in range(8):
+        output = sbox(result[i], i + 1)
+        B3.extend(output)
+    B3_pbox=pbox(B3)
+    L3 = R2
+    R3 = xor(L2, B3_pbox)
+
+    # Iterasi 4
+    E_R3 = ekspansi(R3)
+    A4 = xor(E_R3, K4)
+    result = split_6bit(A4)
+    B4 = []
+    for i in range(8):
+        output = sbox(result[i], i + 1)
+        B4.extend(output)
+    B4_pbox=pbox(B4)
+    L4 = R3
+    R4 = xor(L3, B4_pbox)
+
+    # Iterasi 5
+    E_R4 = ekspansi(R4)
+    A5 = xor(E_R4, K5)
+    result = split_6bit(A5)
+    B5 = []
+    for i in range(8):
+        output = sbox(result[i], i + 1)
+        B5.extend(output)
+    B5_pbox=pbox(B5)
+    L5 = R4
+    R5 = xor(L4, B5_pbox)
+
+    # Iterasi 6
+    E_R5 = ekspansi(R5)
+    A6 = xor(E_R5, K6)
+    result = split_6bit(A6)
+    B6 = []
+    for i in range(8):
+        output = sbox(result[i], i + 1)
+        B6.extend(output)
+    B6_pbox=pbox(B6)
+    L6 = R5
+    R6 = xor(L5, B6_pbox)
+
+    # Iterasi 7
+    E_R6 = ekspansi(R6)
+    A7 = xor(E_R6, K7)
+    result = split_6bit(A7)
+    B7 = []
+    for i in range(8):
+        output = sbox(result[i], i + 1)
+        B7.extend(output)
+    B7_pbox=pbox(B7)
+    L7 = R6
+    R7 = xor(L6, B7_pbox)
+
+    # Iterasi 8
+    E_R7 = ekspansi(R7)
+    A8 = xor(E_R7, K8)
+    result = split_6bit(A8)
+    B8 = []
+    for i in range(8):
+        output = sbox(result[i], i + 1)
+        B8.extend(output)
+    B8_pbox=pbox(B8)
+    L8 = R7
+    R8 = xor(L7, B8_pbox)
+
+    # Iterasi 9
+    E_R8 = ekspansi(R8)
+    A9 = xor(E_R8, K9)
+    result = split_6bit(A9)
+    B9 = []
+    for i in range(8):
+        output = sbox(result[i], i + 1)
+        B9.extend(output)
+    B9_pbox=pbox(B9)
+    L9 = R8
+    R9 = xor(L8, B9_pbox)
+
+    # Iterasi 10
+    E_R9 = ekspansi(R9)
+    A10 = xor(E_R9, K10)
+    result = split_6bit(A10)
+    B10 = []
+    for i in range(8):
+        output = sbox(result[i], i + 1)
+        B10.extend(output)
+    B10_pbox=pbox(B10)
+    L10 = R9
+    R10 = xor(L9, B10_pbox)
+
+    # Iterasi 11
+    E_R10 = ekspansi(R10)
+    A11 = xor(E_R10, K11)
+    result = split_6bit(A11)
+    B11 = []
+    for i in range(8):
+        output = sbox(result[i], i + 1)
+        B11.extend(output)
+    B11_pbox=pbox(B11)
+    L11 = R10
+    R11 = xor(L10, B11_pbox)
+
+    # Iterasi 12
+    E_R11 = ekspansi(R11)
+    A12 = xor(E_R11, K12)
+    result = split_6bit(A12)
+    B12 = []
+    for i in range(8):
+        output = sbox(result[i], i + 1)
+        B12.extend(output)
+    B12_pbox=pbox(B12)
+    L12 = R11
+    R12 = xor(L11, B12_pbox)
+
+    # Iterasi 13
+    E_R12 = ekspansi(R12)
+    A13 = xor(E_R12, K13)
+    result = split_6bit(A13)
+    B13 = []
+    for i in range(8):
+        output = sbox(result[i], i + 1)
+        B13.extend(output)
+    B13_pbox=pbox(B13)
+    L13 = R12
+    R13 = xor(L12, B13_pbox)
+
+    # Iterasi 14
+    E_R13 = ekspansi(R13)
+    A14 = xor(E_R13, K14)
+    result = split_6bit(A14)
+    B14 = []
+    for i in range(8):
+        output = sbox(result[i], i + 1)
+        B14.extend(output)
+    B14_pbox=pbox(B14)
+    L14 = R13
+    R14 = xor(L13, B14_pbox)
+
+    # Iterasi 15
+    E_R14 = ekspansi(R14)
+    A15 = xor(E_R14, K15)
+    result = split_6bit(A15)
+    B15 = []
+    for i in range(8):
+        output = sbox(result[i], i + 1)
+        B15.extend(output)
+    B15_pbox=pbox(B15)
+    L15 = R14
+    R15 = xor(L14, B15_pbox)
+
+    # Iterasi 16
+    E_R15 = ekspansi(R15)
+    A16 = xor(E_R15, K16)
+    result = split_6bit(A16)
+    B16 = []
+    for i in range(8):
+        output = sbox(result[i], i + 1)
+        B16.extend(output)
+    B16_pbox=pbox(B16)
+    L16 = R15
+    R16 = xor(L15, B16_pbox)
+
+    # print("L1:", L1)
+    # print("L2:", L2)
+    # print("L3:", L3)
+    # print("L4:", L4)
+    # print("L5:", L5)
+    # print("L6:", L6)
+    # print("L7:", L7)
+    # print("L8:", L8)    
+    # print("L9:", L9)
+    # print("L10:", L10)
+    # print("L11:", L11)
+    # print("L12:", L12)
+    # print("L13:", L13)
+    # print("L14:", L14)
+    # print("L15:", L15)
+    # print("L16:", L16)
+
+    # print("R1:", R1)
+    # print("R2:", R2)
+    # print("R3:", R3)
+    # print("R4:", R4)
+    # print("R5:", R5)
+    # print("R6:", R6)
+    # print("R7:", R7)
+    # print("R8:", R8)    
+    # print("R9:", R9)
+    # print("R10:", R10)
+    # print("R11:", R11)
+    # print("R12:", R12)
+    # print("R13:", R13)
+    # print("R14:", R14)
+    # print("R15:", R15)
+    # print("R16:", R16)
+
+    final_block = combine(R16, L16)
+    ciphertext = final(final_block)
+    # print("final_block",final_block)
+    # print("FINAL: ", ciphertext)
+    string = ''.join(map(str,ciphertext))
+    # print("String: ", string)
+    print("HEX: ",binary_to_hex(string))
+
+def dekripsi():
+    input_key=input("Masukkan nilai key: ")
+    input_key_binary=string_to_binary_array(input_key)
+    hex=input("Masukkan hex: ")
+    hex_binary=hex_to_binary(hex)
+    hex_IP=IP(hex_binary)
+
+
+    # Generasi K1
+    binary_key_final = PC_1_permutation(input_key_binary)
+    C0, D0 = split_block(binary_key_final)
+    C1 = left_shift(C0)
+    D1 = left_shift(D0)
+    cr_combine1 = combine(C1, D1)
+    K1 = PC_2_permutation(cr_combine1)
+
+    # Generasi K2
+    C2 = left_shift(C1)
+    D2 = left_shift(D1)
+    cr_combine2 = combine(C2, D2)
+    K2 = PC_2_permutation(cr_combine2)
+
+    # Generasi K3
+    C3 = left_shift(left_shift(C2))
+    D3 = left_shift(left_shift(D2))
+    cr_combine3 = combine(C3, D3)
+    K3 = PC_2_permutation(cr_combine3)
+
+    # Generasi K4
+    C4 = left_shift(left_shift(C3))
+    D4 = left_shift(left_shift(D3))
+    cr_combine4 = combine(C4, D4)
+    K4 = PC_2_permutation(cr_combine4)
+
+    # Generasi K5
+    C5 = left_shift(left_shift(C4))
+    D5 = left_shift(left_shift(D4))
+    cr_combine5 = combine(C5, D5)
+    K5 = PC_2_permutation(cr_combine5)
+
+    # Generasi K6
+    C6 = left_shift(left_shift(C5))
+    D6 = left_shift(left_shift(D5))
+    cr_combine6 = combine(C6, D6)
+    K6 = PC_2_permutation(cr_combine6)
+
+    # Generasi K7
+    C7 = left_shift(left_shift(C6))
+    D7 = left_shift(left_shift(D6))
+    cr_combine7 = combine(C7, D7)
+    K7 = PC_2_permutation(cr_combine7)
+
+    # Generasi K8
+    C8 = left_shift(left_shift(C7))
+    D8 = left_shift(left_shift(D7))
+    cr_combine8 = combine(C8, D8)
+    K8 = PC_2_permutation(cr_combine8)
+
+    # Generasi K9
+    C9 = left_shift(C8)
+    D9 = left_shift(D8)
+    cr_combine9 = combine(C9, D9)
+    K9 = PC_2_permutation(cr_combine9)
+
+    # Generasi K10
+    C10 = left_shift(left_shift(C9))
+    D10 = left_shift(left_shift(D9))
+    cr_combine10 = combine(C10, D10)
+    K10 = PC_2_permutation(cr_combine10)
+
+    # Generasi K11
+    C11 = left_shift(left_shift(C10))
+    D11 = left_shift(left_shift(D10))
+    cr_combine11 = combine(C11, D11)
+    K11 = PC_2_permutation(cr_combine11)
+
+    # Generasi K12
+    C12 = left_shift(left_shift(C11))
+    D12 = left_shift(left_shift(D11))
+    cr_combine12 = combine(C12, D12)
+    K12 = PC_2_permutation(cr_combine12)
+
+    # Generasi K13
+    C13 = left_shift(left_shift(C12))
+    D13 = left_shift(left_shift(D12))
+    cr_combine13 = combine(C13, D13)
+    K13 = PC_2_permutation(cr_combine13)
+
+    # Generasi K14
+    C14 = left_shift(left_shift(C13))
+    D14 = left_shift(left_shift(D13))
+    cr_combine14 = combine(C14, D14)
+    K14 = PC_2_permutation(cr_combine14)
+
+    # Generasi K15
+    C15 = left_shift(left_shift(C14))
+    D15 = left_shift(left_shift(D14))
+    cr_combine15 = combine(C15, D15)
+    K15 = PC_2_permutation(cr_combine15)
+
+    # Generasi K16
+    C16 = left_shift(C15)
+    D16 = left_shift(D15)
+    cr_combine16 = combine(C16, D16)
+    K16 = PC_2_permutation(cr_combine16)
+
+    # Iterasi 1
+    L0, R0 = split_block(hex_IP)
+    # print("L0 R0: ",L0,R0)
+    E_R0 = ekspansi(R0)
+    A1 = xor(E_R0, K16)
+    result = split_6bit(A1)
+    B1 = []
+    for i in range(8):
+        output = sbox(result[i], i + 1)
+        B1.extend(output)
+    B1_pbox=pbox(B1)
+    L1 = R0
+    R1 = xor(L0, B1_pbox)
+    # print("L1 R1: ",L1,R1)
+
+    # Iterasi 2
+    E_R1 = ekspansi(R1)
+    A2 = xor(E_R1, K15)
+    result = split_6bit(A2)
+    B2 = []
+    for i in range(8):
+        output = sbox(result[i], i + 1)
+        # print("SBOX",output)
+        B2.extend(output)
+    B2_pbox=pbox(B2)
+    # print("B2_pbox:",B2_pbox)
+    L2 = R1
+    R2 = xor(L1, B2_pbox)
+
+    # Iterasi 3
+    E_R2 = ekspansi(R2)
+    A3 = xor(E_R2, K14)
+    result = split_6bit(A3)
+    B3 = []
+    for i in range(8):
+        output = sbox(result[i], i + 1)
+        B3.extend(output)
+    B3_pbox=pbox(B3)
+    L3 = R2
+    R3 = xor(L2, B3_pbox)
+
+    # Iterasi 4
+    E_R3 = ekspansi(R3)
+    A4 = xor(E_R3, K13)
+    result = split_6bit(A4)
+    B4 = []
+    for i in range(8):
+        output = sbox(result[i], i + 1)
+        B4.extend(output)
+    B4_pbox=pbox(B4)
+    L4 = R3
+    R4 = xor(L3, B4_pbox)
+
+    # Iterasi 5
+    E_R4 = ekspansi(R4)
+    A5 = xor(E_R4, K12)
+    result = split_6bit(A5)
+    B5 = []
+    for i in range(8):
+        output = sbox(result[i], i + 1)
+        B5.extend(output)
+    B5_pbox=pbox(B5)
+    L5 = R4
+    R5 = xor(L4, B5_pbox)
+
+    # Iterasi 6
+    E_R5 = ekspansi(R5)
+    A6 = xor(E_R5, K11)
+    result = split_6bit(A6)
+    B6 = []
+    for i in range(8):
+        output = sbox(result[i], i + 1)
+        B6.extend(output)
+    B6_pbox=pbox(B6)
+    L6 = R5
+    R6 = xor(L5, B6_pbox)
+
+    # Iterasi 7
+    E_R6 = ekspansi(R6)
+    A7 = xor(E_R6, K10)
+    result = split_6bit(A7)
+    B7 = []
+    for i in range(8):
+        output = sbox(result[i], i + 1)
+        B7.extend(output)
+    B7_pbox=pbox(B7)
+    L7 = R6
+    R7 = xor(L6, B7_pbox)
+
+    # Iterasi 8
+    E_R7 = ekspansi(R7)
+    A8 = xor(E_R7, K9)
+    result = split_6bit(A8)
+    B8 = []
+    for i in range(8):
+        output = sbox(result[i], i + 1)
+        B8.extend(output)
+    B8_pbox=pbox(B8)
+    L8 = R7
+    R8 = xor(L7, B8_pbox)
+
+    # Iterasi 9
+    E_R8 = ekspansi(R8)
+    A9 = xor(E_R8, K8)
+    result = split_6bit(A9)
+    B9 = []
+    for i in range(8):
+        output = sbox(result[i], i + 1)
+        B9.extend(output)
+    B9_pbox=pbox(B9)
+    L9 = R8
+    R9 = xor(L8, B9_pbox)
+
+    # Iterasi 10
+    E_R9 = ekspansi(R9)
+    A10 = xor(E_R9, K7)
+    result = split_6bit(A10)
+    B10 = []
+    for i in range(8):
+        output = sbox(result[i], i + 1)
+        B10.extend(output)
+    B10_pbox=pbox(B10)
+    L10 = R9
+    R10 = xor(L9, B10_pbox)
+
+    # Iterasi 11
+    E_R10 = ekspansi(R10)
+    A11 = xor(E_R10, K6)
+    result = split_6bit(A11)
+    B11 = []
+    for i in range(8):
+        output = sbox(result[i], i + 1)
+        B11.extend(output)
+    B11_pbox=pbox(B11)
+    L11 = R10
+    R11 = xor(L10, B11_pbox)
+
+    # Iterasi 12
+    E_R11 = ekspansi(R11)
+    A12 = xor(E_R11, K5)
+    result = split_6bit(A12)
+    B12 = []
+    for i in range(8):
+        output = sbox(result[i], i + 1)
+        B12.extend(output)
+    B12_pbox=pbox(B12)
+    L12 = R11
+    R12 = xor(L11, B12_pbox)
+
+    # Iterasi 13
+    E_R12 = ekspansi(R12)
+    A13 = xor(E_R12, K4)
+    result = split_6bit(A13)
+    B13 = []
+    for i in range(8):
+        output = sbox(result[i], i + 1)
+        B13.extend(output)
+    B13_pbox=pbox(B13)
+    L13 = R12
+    R13 = xor(L12, B13_pbox)
+
+    # Iterasi 14
+    E_R13 = ekspansi(R13)
+    A14 = xor(E_R13, K3)
+    result = split_6bit(A14)
+    B14 = []
+    for i in range(8):
+        output = sbox(result[i], i + 1)
+        B14.extend(output)
+    B14_pbox=pbox(B14)
+    L14 = R13
+    R14 = xor(L13, B14_pbox)
+
+    # Iterasi 15
+    E_R14 = ekspansi(R14)
+    A15 = xor(E_R14, K2)
+    result = split_6bit(A15)
+    B15 = []
+    for i in range(8):
+        output = sbox(result[i], i + 1)
+        B15.extend(output)
+    B15_pbox=pbox(B15)
+    L15 = R14
+    R15 = xor(L14, B15_pbox)
+
+    # Iterasi 16
+    E_R15 = ekspansi(R15)
+    A16 = xor(E_R15, K1)
+    result = split_6bit(A16)
+    B16 = []
+    for i in range(8):
+        output = sbox(result[i], i + 1)
+        B16.extend(output)
+    B16_pbox=pbox(B16)
+    L16 = R15
+    R16 = xor(L15, B16_pbox)
+
+    final_block = combine(R16, L16)
+    ciphertext = final(final_block)
+    # print("final_block",final_block)
+    # print("FINAL: ", ciphertext)
+    string = ''.join(map(str,ciphertext))
+    plain_text = "".join([chr(int(string[i : i + 8], 2)) for i in range(0, len(string), 8)])
+    print("PLain: ", plain_text)
+
+
+while(True):
+    pilihan=input("Masukan pilihan:\n1. Enkripsi\n2. Dekripsi\nPilih Menu: ")
+    if(pilihan=="1"):
+        enkripsi()
+    elif(pilihan=="2"):
+        dekripsi()
+    else:
+        break
